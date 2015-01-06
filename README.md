@@ -3,6 +3,8 @@
 The more diverse the tor network is geographically, the more secure it is.
 This project aims to help people visualize where most tor nodes are ran (hint: as of 2015 January it's North America and Europe).
 
+The end goal of this program is to help people find new countries to run relays in.
+
 ## Running
 
 Running is simple:
