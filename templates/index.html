@@ -10,11 +10,6 @@
 	<link rel="stylesheet" href="/css/tor-diversity.css">
 
 
-<!-- Advice from TomvdW on #tor
-you could maybe do sum(observed_bw)/sum(consensus)*individual_consensus, which might provide a decent estimate
-(as in: check the global ratio between observed bandwidth and consensus weight, then use that to get the individual ones
--->
-
 </head>
 <body>
 
@@ -46,28 +41,28 @@ you could maybe do sum(observed_bw)/sum(consensus)*individual_consensus, which m
 		<h2>TODO</h2>
 		<p>
 		This page is no where near complete.
-		<ul>
-			<li>It is ugly.</li>
-			<li>It should link to VPSs in the respective countries.</li>
-			<li>There should be a stronger score for how low a country is rated, leading to a total diversity score.</li>
-			<li>Should be percent of total per category.</li>
-		</ul>
-
+		Please see the <a href="https://github.com/chris-barry/tor-relay-diversity">TODO</a> in the code repo.
 		</p>
 
 		<table border=2 class="sortable">
 			<tr>
 				<th>Country</th>
 				<th>Count</th>
+				<th>Count %</th>
 				<th>Consensus Weight</th>
+				<th>Consensus Weight %</th>
 				<th>Bandwidth (Bps)</th>
+				<th>Bandwidth (Bps) %</th>
 			</tr>
 			{%- for country in stats recursive %}
 			<tr>
 				<td>{{country['real']}}</td>
 				<td>{{country['count']}}</td>
+				<td>{{country['count_percent']}}</td>
 				<td>{{country['weight']}}</td>
+				<td>{{country['weight_percent']}}</td>
 				<td>{{country['bandwidth']}}</td>
+				<td>{{country['bandwidth_percent']}}</td>
 			</tr>
 			{% endfor %}
 		</table>
@@ -76,12 +71,16 @@ you could maybe do sum(observed_bw)/sum(consensus)*individual_consensus, which m
 	<hr/>
 
 	<footer id="footer">
-		<p>If you can make sites look pretty and the styling here annoys you, help out!</p>
-		<p>Last updated at {{time}}.</p>
-		<p>Data fetched from <a href="https://onionoo.torproject.org/">Onionoo</a>.</p>
+		<p>
+		Last updated at <time>{{time}}</time>.
+		| Data fetched from <a href="https://onionoo.torproject.org/">Onionoo</a>.
+		| Code is on <a href="https://github.com/chris-barry/tor-relay-diversity">Github</a>.
+		</p>
 	</footer>
 
+	<!--
 	<script> sorttable.makeSortable(document.querySelectorAll("#posts > table:nth-child(1)")[0]); </script>
+	-->
 	<script src="/js/sorttable.js"></script>
 
 </body>
