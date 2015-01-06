@@ -9,7 +9,7 @@ The end goal of this program is to help people find new countries to run relays 
 
 Running is simple:
 
-	python diversity.py > tor.html
+	python diversity.py -f tor.html
 
 Don't query too often, since the data is pulled from [Onionoo](https://onionoo.torproject.org).
 If you need to more often, use the `--debug` flag.
