@@ -1,0 +1,11 @@
+Prettify
+just add commas every three digits on the numbers
+change the bandwidth from Bps to MBps, just to make them both more readable.
+
+Host CSS/JS inline.
+Link to VPSs.
+There should be a stronger score for how low a country is rated, leading to a total diversity score.
+
+# Advice from TomvdW on #tor
+you could maybe do sum(observed_bw)/sum(consensus)*individual_consensus, which might provide a decent estimate
+(as in: check the global ratio between observed bandwidth and consensus weight, then use that to get the individual ones
