@@ -110,7 +110,7 @@ def make_template(template_file="index.html", f="tor.html", stats={}):
 	f = open(f, "w")
 	f.write(template.render(
 		stats=stats,
-		time=datetime.datetime.now(),
+		time=datetime.datetime.utcnow(),
 		number_format='{:,}',
 		percent_format='{0:0.2f}')
 	)
@@ -123,6 +123,7 @@ if __name__ == '__main__':
 	parser.add_argument('-f', '--output-file', help='Where to save file', type=str, default="tor.html")
 	parser.add_argument('-t', '--template-file', help='What template to use, only HTML made right now', type=str, default="index.html")
 	args = parser.parse_args()
+
 
 	relays = get_relays(debug=args.debug)
 	stats = run_stats(nodes=relays)
