@@ -7,8 +7,7 @@
 	</title>
 
 	<!-- TODO: make these hosted elsewhere. -->
-	<link rel="stylesheet" href="/css/tor-diversity.css">
-
+	<link rel="stylesheet" href="css/tor-diversity.css">
 
 </head>
 <body>
@@ -47,22 +46,28 @@
 		<table border=2 class="sortable">
 			<tr>
 				<th>Country</th>
+
 				<th>Count</th>
-				<th>Count %</th>
-				<th>Consensus Weight</th>
-				<th>Consensus Weight %</th>
+				<th>Count (%)</th>
+
+				<th>Consensus Weight (unit?)</th>
+				<th>Consensus Weight (%)</th>
+
 				<th>Bandwidth (Bps)</th>
-				<th>Bandwidth (Bps) %</th>
+				<th>Bandwidth (%)</th>
 			</tr>
 			{%- for country in stats recursive %}
 			<tr>
 				<td>{{country['real']}}</td>
-				<td>{{country['count']}}</td>
-				<td>{{country['count_percent']}}</td>
-				<td>{{country['weight']}}</td>
-				<td>{{country['weight_percent']}}</td>
-				<td>{{country['bandwidth']}}</td>
-				<td>{{country['bandwidth_percent']}}</td>
+
+				<td>{{number_format.format(country['count'])}}</td>
+				<td>{{percent_format.format(country['count_percent'])}}</td>
+
+				<td>{{number_format.format(country['weight'])}}</td>
+				<td>{{percent_format.format(country['weight_percent'])}}</td>
+
+				<td>{{number_format.format(country['bandwidth'])}}</td>
+				<td>{{percent_format.format(country['bandwidth_percent'])}}</td>
 			</tr>
 			{% endfor %}
 		</table>
@@ -78,10 +83,7 @@
 		</p>
 	</footer>
 
-	<!--
-	<script> sorttable.makeSortable(document.querySelectorAll("#posts > table:nth-child(1)")[0]); </script>
-	-->
-	<script src="/js/sorttable.js"></script>
+	<script src="js/sorttable.js"></script>
 
 </body>
 </html>

@@ -66,12 +66,12 @@ def run_stats(nodes):
 		except KeyError:
 			print relay.geo[0]
 
+	# This helps with math later.
 	total = float(stats['total']['count'])
 	weight = float(stats['total']['weight'])
 	bandwidth = float(stats['total']['bandwidth'])
 
 	# Compare each country to the total.
-	# NOTE: This is not on the page currently.
 	for relay in relays.relays:
 		# We do not want to count relays which are not running.
 		if not relay.running or relay.hibernating:
@@ -82,7 +82,6 @@ def run_stats(nodes):
 				key = 'None'
 			else:
 				key = relay.geo[0]
-			# TODO: Try and get rid of some float conversions.
 			stats[key]['count_percent'] = (stats[key]['count'] / total) * 100
 			stats[key]['weight_percent'] = (stats[key]['weight'] / weight) * 100
 			stats[key]['bandwidth_percent'] = (stats[key]['bandwidth'] / bandwidth) * 100
@@ -92,7 +91,7 @@ def run_stats(nodes):
 	# Sanity - all should be 100% += floating point errors.
 	stats['total']['count_percent'] = (stats['total']['count'] / total) * 100
 	stats['total']['weight_percent'] = (stats['total']['weight'] / weight) * 100
-	stats['total']['bandwidth_percent'] = (stats['total']['count'] / bandwidth) * 100
+	stats['total']['bandwidth_percent'] = (stats['total']['bandwidth'] / bandwidth) * 100
 
 	# Sort by country name.
 	stats_sorted = []
@@ -109,7 +108,12 @@ def make_template(template_file="index.html", f="tor.html", stats={}):
 	env = Environment(loader=FileSystemLoader('templates'))
 	template = env.get_template(template_file)
 	f = open(f, "w")
-	f.write(template.render(stats=stats, time=datetime.datetime.now()))
+	f.write(template.render(
+		stats=stats,
+		time=datetime.datetime.now(),
+		number_format='{:,}',
+		percent_format='{0:0.2f}')
+	)
 	f.close()
 
 # Real work starts here.
