@@ -67,6 +67,11 @@ def run_stats(nodes):
 			stats[key]['exit_probability'] += relay.exit_probability
 			stats[key]['as'][relay.as_number] = 1
 
+			if relay.family is not None:
+				for family in relay.family:
+					stats[key]['family'][family] = 1
+					stats['total']['family'][family] = 1
+
 			stats['total']['count'] += 1
 			stats['total']['weight'] += relay.consensus_weight
 			stats['total']['bandwidth'] += relay.bandwidth[2]
