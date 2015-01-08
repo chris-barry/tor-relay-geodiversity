@@ -9,7 +9,11 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
     content: " \25B4\25BE" 
 }
 
-.template {
-	display:none;
+/* alternate colors */
+table.sortable tbody tr:nth-child(2n) td {
+	background: #dddddd;
+}
+table.sortable tbody tr:nth-child(2n+1) td {
+	background: #ccfffff;
 }
 
