@@ -34,6 +34,7 @@ def new_dict(name=''):
 		'count_percent':     0,
 		'bandwidth_percent': 0,
 		'weight_percent':    0,
+		'exit_probability':  0,
 		'real':              name,
 		}
 
@@ -61,10 +62,12 @@ def run_stats(nodes):
 			stats[key]['count'] += 1
 			stats[key]['weight'] += relay.consensus_weight
 			stats[key]['bandwidth'] += relay.bandwidth[2] # observed in bytes per second
+			stats[key]['exit_probability'] += relay.exit_probability
 
 			stats['total']['count'] += 1
 			stats['total']['weight'] += relay.consensus_weight
 			stats['total']['bandwidth'] += relay.bandwidth[2]
+			stats['total']['exit_probability'] += relay.exit_probability
 		except KeyError:
 			print relay.geo[0]
 

@@ -61,6 +61,8 @@
 
 				<th>Bandwidth (MBps)</th>
 				<th>Bandwidth (%)</th>
+
+				<th>Exit Probablility</th>
 			</tr>
 			{%- for country in stats %}
 			<tr>
@@ -74,6 +76,8 @@
 
 				<td>{{number_format.format((country['bandwidth']/1000000))}}</td>
 				<td>{{percent_format.format(country['bandwidth_percent'])}}</td>
+
+				<td>{{percent_format.format(country['exit_probability'])}}</td>
 			</tr>
 			{% endfor %}
 		</table>
