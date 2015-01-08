@@ -43,41 +43,34 @@
 		Some of these countries do not run tor nodes for good reasons, weather it is political or technological.
 		</p>
 
-		<h2>TODO</h2>
 		<p>
 		This page is nowhere near complete.
 		Please see the <a href="https://github.com/chris-barry/tor-relay-diversity">TODO</a> in the git repository.
 		</p>
+		
+		<h2>Maps</h2>
+		<p>
+		<em>TODO</em>
+		They will hopefully look <a href="http://bl.ocks.org/mbostock/4060606">like this</a>.
+		</p>
+
+		<h2>Tabulated Data</h2>
 
 		<table border=2 class="sortable">
 			<tr>
 				<th>Country</th>
-
 				<th>Count</th>
-				<th>Count (%)</th>
-
 				<th>Consensus Weight (unit?)</th>
-				<th>Consensus Weight (%)</th>
-
 				<th>Bandwidth (MBps)</th>
-				<th>Bandwidth (%)</th>
-
 				<th>Exit Probablility</th>
 			</tr>
 			{%- for country in stats %}
 			<tr>
-				<td>{{country['real']}}</td>
-
-				<td>{{number_format.format(country['count'])}}</td>
-				<td>{{percent_format.format(country['count_percent'])}}</td>
-
-				<td>{{number_format.format(country['weight'])}}</td>
-				<td>{{percent_format.format(country['weight_percent'])}}</td>
-
-				<td>{{number_format.format((country['bandwidth']/1000000))}}</td>
-				<td>{{percent_format.format(country['bandwidth_percent'])}}</td>
-
-				<td>{{percent_format.format(country['exit_probability'])}}</td>
+				<td>{{country['country_name']}}</td>
+				<td sorttable_customkey="{{number_format.format(country['count'])}}">{{number_format.format(country['count'])}} ({{percent_format.format(country['count_percent'])}}%)</td>
+				<td sorttable_customkey="{{number_format.format(country['weight'])}}">{{number_format.format(country['weight'])}} ({{percent_format.format(country['weight_percent'])}}%)</td>
+				<td sorttable_customkey="{{number_format.format((country['bandwidth']/1000000))}}">{{number_format.format((country['bandwidth']/1000000))}} ({{percent_format.format(country['bandwidth_percent'])}}%)</td>
+				<td sorttable_customkey="{{percent_format.format(country['exit_probability'])}}">{{percent_format.format(country['exit_probability'])}}%</td>
 			</tr>
 			{% endfor %}
 		</table>
