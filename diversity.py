@@ -35,7 +35,7 @@ def new_dict(name=''):
 		'bandwidth_percent': 0,
 		'weight_percent':    0,
 		'exit_probability':  0,
-		'real':              name,
+		'country_name':      name,
 		}
 
 def run_stats(nodes):
@@ -90,6 +90,7 @@ def run_stats(nodes):
 			stats[key]['count_percent'] = (stats[key]['count'] / total) * 100
 			stats[key]['weight_percent'] = (stats[key]['weight'] / weight) * 100
 			stats[key]['bandwidth_percent'] = (stats[key]['bandwidth'] / bandwidth) * 100
+			# NOTE: we don not include exit_probability since it will go to 1.0 itself.
 		except KeyError:
 			print type(relay.geo[0])
 
