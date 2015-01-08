@@ -9,7 +9,10 @@ The end goal of this program is to help people find new countries to run relays 
 
 Running is simple:
 
-	python diversity.py -f tor.html
+	python diversity.py -output-dir output/
+
+This will put the functioning site in the `output` folder.
+Server that folder from any web server and you are sharing statistics!
 
 Don't query too often, since the data is pulled from [Onionoo](https://onionoo.torproject.org).
 If you need to more often, use the `--debug` flag.
@@ -25,3 +28,4 @@ That puts you in debug mode and grabs less relays.
 
 [Unlicense](http://unlicense.org).
 In `LICENSE`.
+

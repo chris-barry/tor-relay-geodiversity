@@ -9,9 +9,11 @@ from iso3166 import countries
 from jinja2 import Environment, PackageLoader, FileSystemLoader
 from onion_py.manager import Manager
 from onion_py.caching import OnionSimpleCache
-import datetime
-import argparse
 
+import argparse
+import datetime
+import shutil
+import os
 import pprint
 
 
@@ -104,27 +106,37 @@ def run_stats(nodes):
 
 
 # Do the templating
-def make_template(template_file="index.html", f="tor.html", stats={}):
+def make_template(stats={}):
 	env = Environment(loader=FileSystemLoader('templates'))
-	template = env.get_template(template_file)
-	f = open(f, "w")
-	f.write(template.render(
+	template = env.get_template('index.html')
+	return template.render(
 		stats=stats,
 		time=datetime.datetime.utcnow(),
 		number_format='{:,}',
 		percent_format='{0:0.2f}')
-	)
-	f.close()
+
 
 # Real work starts here.
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-d', '--debug', help='Enable debug settings', action='store_true')
-	parser.add_argument('-f', '--output-file', help='Where to save file', type=str, default="tor.html")
-	parser.add_argument('-t', '--template-file', help='What template to use, only HTML made right now', type=str, default="index.html")
+	parser.add_argument('-o', '--output-dir', help='Where to save file', type=str, default='output/')
 	args = parser.parse_args()
-
 
 	relays = get_relays(debug=args.debug)
 	stats = run_stats(nodes=relays)
-	make_template(template_file=args.template_file, f=args.output_file, stats=stats)
+	s = make_template(stats=stats)
+
+	f = open(os.path.join(args.output_dir, 'index.html'), 'w')
+	f.write(s)
+	f.close()
+
+	try:
+		shutil.rmtree(os.path.join(args.output_dir, 'js'))
+		shutil.rmtree(os.path.join(args.output_dir, 'css'))
+	except:
+		pass # we don't care if it fails.
+
+	shutil.copytree('templates/js', os.path.join(args.output_dir, 'js'), symlinks=False, ignore=None)
+	shutil.copytree('templates/css', os.path.join(args.output_dir, 'css'), symlinks=False, ignore=None)
+
