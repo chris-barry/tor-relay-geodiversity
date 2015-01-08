@@ -63,6 +63,7 @@
 				<th>Consensus Weight (unit?)</th>
 				<th>Bandwidth (MBps)</th>
 				<th>Exit Probablility</th>
+				<th>Unique ASs</th>
 			</tr>
 			{%- for country in stats %}
 			<tr>
@@ -71,6 +72,7 @@
 				<td sorttable_customkey="{{number_format.format(country['weight'])}}">{{number_format.format(country['weight'])}} ({{percent_format.format(country['weight_percent'])}}%)</td>
 				<td sorttable_customkey="{{number_format.format((country['bandwidth']/1000000))}}">{{number_format.format((country['bandwidth']/1000000))}} ({{percent_format.format(country['bandwidth_percent'])}}%)</td>
 				<td sorttable_customkey="{{percent_format.format(country['exit_probability'])}}">{{percent_format.format(country['exit_probability'])}}%</td>
+				<td>{{country['as']|count}}</td>
 			</tr>
 			{% endfor %}
 		</table>

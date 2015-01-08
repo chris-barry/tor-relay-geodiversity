@@ -29,13 +29,15 @@ def get_relays(debug=False):
 def new_dict(name=''):
 	return {
 		'count':             0,
-		'bandwidth':         0,
-		'weight':            0,
 		'count_percent':     0,
+		'bandwidth':         0,
 		'bandwidth_percent': 0,
+		'weight':            0,
 		'weight_percent':    0,
 		'exit_probability':  0,
 		'country_name':      name,
+		'as':                {},
+		'family':            {},
 		}
 
 def run_stats(nodes):
@@ -63,11 +65,13 @@ def run_stats(nodes):
 			stats[key]['weight'] += relay.consensus_weight
 			stats[key]['bandwidth'] += relay.bandwidth[2] # observed in bytes per second
 			stats[key]['exit_probability'] += relay.exit_probability
+			stats[key]['as'][relay.as_number] = 1
 
 			stats['total']['count'] += 1
 			stats['total']['weight'] += relay.consensus_weight
 			stats['total']['bandwidth'] += relay.bandwidth[2]
 			stats['total']['exit_probability'] += relay.exit_probability
+			stats['total']['as'][relay.as_number] = 1
 		except KeyError:
 			print relay.geo[0]
 
