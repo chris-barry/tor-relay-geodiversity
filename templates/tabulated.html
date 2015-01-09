@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}
+tabulated
+{% endblock %}
+
+{% block css_extra %}
+<link rel="stylesheet" href="css/tor-diversity.css">
+{% endblock %}
+
+{% block js_extra %}
+<script src="js/sorttable.js"></script>
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+<h1>Tabulated Data</h1>
+
+<table border=2 class="sortable">
+	<tr>
+		<th>Country</th>
+		<th>Count</th>
+		<th>Consensus Weight (unit?)</th>
+		<th>Bandwidth (MBps)</th>
+		<th>Exit Probablility</th>
+		<th>Unique ASs</th>
+		<th>Unique Family</th>
+	</tr>
+	{%- for country in stats %}
+	<tr>
+		<td>{{country['country_name']}}</td>
+		<td sorttable_customkey="{{number_format.format(country['count'])}}">{{number_format.format(country['count'])}} ({{percent_format.format(country['count_percent'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format(country['weight'])}}">{{number_format.format(country['weight'])}} ({{percent_format.format(country['weight_percent'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format((country['bandwidth']/1000000))}}">{{number_format.format((country['bandwidth']/1000000))}} ({{percent_format.format(country['bandwidth_percent'])}}%)</td>
+		<td sorttable_customkey="{{percent_format.format(country['exit_probability'])}}">{{percent_format.format(country['exit_probability'])}}%</td>
+		<td>{{country['as']|count}}</td>
+		<td>{{country['family']|count}}</td>
+	</tr>
+	{% endfor %}
+		</table>
+	</div>
+{% endblock %}
+
