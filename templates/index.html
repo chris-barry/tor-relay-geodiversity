@@ -1,97 +1,66 @@
-<!doctype html>
-<html lang="en">
-<head>
-	<meta charset="utf-8"> 
-	<title>
-	Tor Geodiversity Information
-	</title>
+{% extends 'base.html' %}
 
-	<!-- TODO: make these hosted elsewhere. -->
-	<link rel="stylesheet" href="css/tor-diversity.css">
+{% block title %}
+Tor Geodiversity Information
+{% endblock %}
 
-</head>
-<body>
+{% block css_extra %}
+<link rel="stylesheet" href="css/tor-diversity.css">
+{% endblock %}
 
-	<span>
-		<h1>Tor Network Geodiversity Information</h1>
-	</span>
+{% block js_extra %}
+<script src="js/sorttable.js"></script>
+{% endblock %}
 
-	<hr/>
+{% block header %}
+About Tor Network Geodiversity
+{% endblock %}
 
-	<div id="content">
-		<noscript>
-			<p>
-			You are seeing this because you have JavaScript disabled.
-			It is mainly used on this page to make it look prettier.
-			The code is not obfuscated at all, go have a look!
-			The page will work without JS, but will look ugly.
-			</p>
-		</noscript>
+{% block content %}
+<h2>About</h2>
+<p>
+The more diverse the Tor network, the harder it is to track a connection.
+Currently there are a large number of nodes in North America and Europe.
+As of 2014, <a href="http://www.spiegel.de/international/world/nsa-documents-attacks-on-vpn-ssl-tls-ssh-tor-a-1010525.html">there is not enough coverage of the Tor network to perform circuit analysis</a>.
+Even though it's good enough, the Five Eyes only get more eyes.
+Diversity needs to spread even more, primarily in Asia, South America, Africa, and Oceania.
+</p>
 
-		<h2>About</h2>
-		<p>
-		The more diverse the Tor network, the harder it is to track a connection.
-		Currently there are a large number of nodes in North America and Europe.
-		As of 2014, <a href="http://www.spiegel.de/international/world/nsa-documents-attacks-on-vpn-ssl-tls-ssh-tor-a-1010525.html">there is not enough coverage of the Tor network to perform circuit analysis</a>.
-		Even though it's good enough, the Five Eyes only get more eyes.
-		Diversity needs to spread even more, primarily in Asia, South America, Africa, and Oceania.
-		</p>
+<p>
+This software is probably not perfect.
+It is a good reference but is not suitable for human judgement.
+Some of these countries do not run tor nodes for good reasons, weather it is political or technological.
+</p>
 
-		<p>
-		This software is probably not perfect.
-		It is a good reference but is not suitable for human judgement.
-		Some of these countries do not run tor nodes for good reasons, weather it is political or technological.
-		</p>
+<p>
+This page is nowhere near complete.
+Please see the <a href="https://github.com/chris-barry/tor-relay-diversity">TODO</a> in the git repository.
+</p>
 
-		<p>
-		This page is nowhere near complete.
-		Please see the <a href="https://github.com/chris-barry/tor-relay-diversity">TODO</a> in the git repository.
-		</p>
-		
-		<h2>Maps</h2>
-		<p>
-		<em>TODO</em>
-		They will hopefully look <a href="http://bl.ocks.org/mbostock/4060606">like this</a>.
-		</p>
+<h2>Tabulated Data</h2>
 
-		<h2>Tabulated Data</h2>
-
-		<table border=2 class="sortable">
-			<tr>
-				<th>Country</th>
-				<th>Count</th>
-				<th>Consensus Weight (unit?)</th>
-				<th>Bandwidth (MBps)</th>
-				<th>Exit Probablility</th>
-				<th>Unique ASs</th>
-				<th>Unique Family</th>
-			</tr>
-			{%- for country in stats %}
-			<tr>
-				<td>{{country['country_name']}}</td>
-				<td sorttable_customkey="{{number_format.format(country['count'])}}">{{number_format.format(country['count'])}} ({{percent_format.format(country['count_percent'])}}%)</td>
-				<td sorttable_customkey="{{number_format.format(country['weight'])}}">{{number_format.format(country['weight'])}} ({{percent_format.format(country['weight_percent'])}}%)</td>
-				<td sorttable_customkey="{{number_format.format((country['bandwidth']/1000000))}}">{{number_format.format((country['bandwidth']/1000000))}} ({{percent_format.format(country['bandwidth_percent'])}}%)</td>
-				<td sorttable_customkey="{{percent_format.format(country['exit_probability'])}}">{{percent_format.format(country['exit_probability'])}}%</td>
-				<td>{{country['as']|count}}</td>
-				<td>{{country['family']|count}}</td>
-			</tr>
-			{% endfor %}
+<table border=2 class="sortable">
+	<tr>
+		<th>Country</th>
+		<th>Count</th>
+		<th>Consensus Weight (unit?)</th>
+		<th>Bandwidth (MBps)</th>
+		<th>Exit Probablility</th>
+		<th>Unique ASs</th>
+		<th>Unique Family</th>
+	</tr>
+	{%- for country in stats %}
+	<tr>
+		<td>{{country['country_name']}}</td>
+		<td sorttable_customkey="{{number_format.format(country['count'])}}">{{number_format.format(country['count'])}} ({{percent_format.format(country['count_percent'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format(country['weight'])}}">{{number_format.format(country['weight'])}} ({{percent_format.format(country['weight_percent'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format((country['bandwidth']/1000000))}}">{{number_format.format((country['bandwidth']/1000000))}} ({{percent_format.format(country['bandwidth_percent'])}}%)</td>
+		<td sorttable_customkey="{{percent_format.format(country['exit_probability'])}}">{{percent_format.format(country['exit_probability'])}}%</td>
+		<td>{{country['as']|count}}</td>
+		<td>{{country['family']|count}}</td>
+	</tr>
+	{% endfor %}
 		</table>
 	</div>
-	
-	<hr/>
-
-	<footer id="footer">
-		<p>
-		Last updated at <time>{{time}} UTC</time>.
-		| Data fetched from <a href="https://onionoo.torproject.org/">Onionoo</a>.
-		| Code is on <a href="https://github.com/chris-barry/tor-relay-diversity">GitHub</a>.
-		</p>
-	</footer>
-
-	<script src="js/sorttable.js"></script>
-
-</body>
-</html>
+{% endblock %}
 

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"> 
+	<title>
+	Flask Demo - 
+	{% block title %}
+	{% endblock %}
+	</title>
+
+	{% block css_extra %}
+	{% endblock %}
+
+</head>
+<body>
+
+	<span>
+		<p>
+			{% block header %}
+			{% endblock %}
+		</p>
+	</span>
+
+	<hr/>
+
+		<noscript>
+			<p>
+			You are seeing this because you have JavaScript disabled.
+			It is mainly used on this page to make it look prettier.
+			The code is not obfuscated at all, go have a look!
+			The page will work without JS, but will look ugly.
+			</p>
+		</noscript>
+
+	<div id="content">
+		{% block content%}
+		{% endblock%}
+	</div>
+
+	<hr/>
+
+	<footer id="footer">
+		Last updated at <time>{{time}} UTC</time>.
+		| Data fetched from <a href="https://onionoo.torproject.org/">Onionoo</a>.
+		| Code is on <a href="https://github.com/chris-barry/tor-relay-diversity">GitHub</a>.
+	</footer>
+
+	<script src="js/sorttable.js"></script>
+	{% block js_extra %}
+	{% endblock%}
+
+</body>
+</html>
+
