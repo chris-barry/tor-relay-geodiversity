@@ -119,14 +119,17 @@ def run_stats(nodes):
 
 
 # Do the templating
-def make_template(stats={}):
+def make_template(stats={}, out_dir='.', template_file='index.html'):
 	env = Environment(loader=FileSystemLoader('templates'))
-	template = env.get_template('index.html')
-	return template.render(
+	template = env.get_template(template_file)
+	s = template.render(
 		stats=stats,
 		time=datetime.datetime.utcnow(),
 		number_format='{:,}',
 		percent_format='{0:0.2f}')
+	f = open(os.path.join(out_dir, template_file), 'w')
+	f.write(s)
+	f.close()
 
 
 # Real work starts here.
@@ -138,11 +141,9 @@ if __name__ == '__main__':
 
 	relays = get_relays(debug=args.debug)
 	stats = run_stats(nodes=relays)
-	s = make_template(stats=stats)
+	make_template(stats=stats, out_dir=args.output_dir, template_file='index.html')
+	make_template(stats=stats, out_dir=args.output_dir, template_file='tabulated.html')
 
-	f = open(os.path.join(args.output_dir, 'index.html'), 'w')
-	f.write(s)
-	f.close()
 
 	try:
 		shutil.rmtree(os.path.join(args.output_dir, 'js'))
