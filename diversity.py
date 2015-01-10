@@ -110,35 +110,27 @@ def run_stats(nodes):
 			stats[key]['bandwidth_percent'] = (stats[key]['bandwidth'] / bandwidth) * 100
 			# NOTE: we do not include exit_probability since it will go to 1.0 itself.
 
-
 		except KeyError:
 			print type(relay.geo[0])
+
+		total_countries = len(countries)
+		as_avg = len(stats['total']['as']) / total_countries
+		bandwidth_avg = stats['total']['bandwidth'] / total_countries
+		count_avg = stats['total']['count'] / total_countries
+		exit_probability_avg = stats['total']['exit_probability'] / total_countries
+		weight_avg = stats['total']['weight'] / total_countries
 
 		for c in countries:
 			key = c.alpha2.lower()
 			# Do the quintiles for the number of nodes per country.
-			c = stats[key]['count_percent']
-			stats[key]['count_q'] = 'NONE'
-			if c > 0 and c <= 10:
-				stats[key]['count_q'] = 'zero'
-			if c >= 10 and c <= 19:
-				stats[key]['count_q'] = 'one'
-			if c >= 20 and c <= 29:
-				stats[key]['count_q'] = 'two'
-			if c >= 30 and c <= 39:
-				stats[key]['count_q'] = 'three'
-			if c >= 40 and c <= 49:
-				stats[key]['count_q'] = 'four'
-			if c >= 50 and c <= 59:
-				stats[key]['count_q'] = 'five'
-			if c >= 60 and c <= 69:
-				stats[key]['count_q'] = 'six'
-			if c >= 70 and c <= 79:
-				stats[key]['count_q'] = 'seven'
-			if c >= 80 and c <= 89:
-				stats[key]['count_q'] = 'eight'
-			if c >= 90 and c <= 100:
-				stats[key]['count_q'] = 'nine'
+			c = stats[key]['count']
+			if stats[key]['count'] >= count_avg:
+				stats[key]['count_q'] = 'Over'
+			if stats[key]['count'] < count_avg:
+				stats[key]['count_q'] = 'Under'
+			if stats[key]['count'] == 0:
+				stats[key]['count_q'] = 'None'
+				
 
 	# Sanity - all should be 100% += floating point errors.
 	stats['total']['count_percent'] = (stats['total']['count'] / total) * 100
