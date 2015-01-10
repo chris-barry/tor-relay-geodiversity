@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}
+mapped
+{% endblock %}
+
+{% block css_extra %}
+{% endblock %}
+
+{% block js_extra %}
+<script src="js/d3.v3.min.js"></script>
+<script src="js/topojson.v1.min.js"></script>
+<script src="js/datamaps.world.min.js"></script>
+
+<script>
+	var map = new Datamap({
+		scope: 'world',
+		element: document.getElementById('container'),
+		projection: 'equirectangular',
+		height: '500',
+		geographyConfig: {
+			popupTemplate: function(geography, data) {
+				return '<div class="hoverinfo"> <b>' + geography.properties.name + '</b>: ' + data.count+ ' </div>';
+			},
+		},
+		fills: {
+			/* these two should stay the same. */
+			defaultFill: 'gray',
+			NONE: 'gray',
+
+			nine:  '#003D14',
+			eight: '#004C1A',
+			seven: '#005C1F',
+			six:   '#006B24',
+			five:  '#007A29',
+			four:  '#008A2E',
+			three: '#009933',
+			two:   '#19A347',
+			one:   '#33AD5C',
+			zero:  '#4DB870',
+		},
+
+		data: {
+		{%- for country in stats %}
+		{{country['country_name3']}}: { fillKey: '{{country['count_q']}}', count:{{country['count']}} },{% endfor %}
+		}
+
+	})
+	map.legend();
+</script>
+{% endblock %}
+
+{% block header %}
+About Tor Network Geodiversity
+{% endblock %}
+
+{% block content %}
+<h1>Nodes Per Country</h1>
+<p>Don't relay on the colors too heavily yet.</p>
+<div id="container"></div>
+<br>
+{% endblock %}
+
