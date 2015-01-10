@@ -173,7 +173,7 @@ if __name__ == '__main__':
 
 	make_template(stats=stats, out_dir=args.output_dir, template_file='index.html')
 	make_template(stats=stats, out_dir=args.output_dir, template_file='tabulated.html')
-	make_template(stats=stats, out_dir=args.output_dir, template_file='mapped.html')
+	make_template(stats=stats, out_dir=args.output_dir, template_file='mapped-count.html')
 
 	try:
 		shutil.rmtree(os.path.join(args.output_dir, 'js'))
