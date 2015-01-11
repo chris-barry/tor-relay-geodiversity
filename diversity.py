@@ -101,13 +101,7 @@ def run_stats(nodes):
 			stats[key]['bandwidth'] += relay.bandwidth[2] # observed in bytes per second
 			stats[key]['exit_probability'] += relay.exit_probability
 			stats[key]['as'][relay.as_number] = 1
-
-			""" # This does not do what I thought it would.
-			if relay.family is not None:
-				for family in relay.family:
-					stats[key]['family'][family] = 1
-					total['family'][family] = 1
-			"""
+		
 
 			total['count'] += 1
 			total['weight'] += relay.consensus_weight
@@ -149,11 +143,38 @@ def run_stats(nodes):
 		except KeyError:
 			print relay.geo[0]
 
+		# Averages
 		total['as_avg'] = len(total['as']) / countries_total
 		total['bandwidth_avg'] = total['bandwidth'] / countries_total
 		total['count_avg'] = total['count'] / countries_total
 		total['exit_probability_avg'] = total['exit_probability'] / countries_total
 		total['weight_avg'] = total['weight'] / countries_total
+
+		# Ranges
+		if len(stats[key]['as']) <= total['as_min']:
+			total['as_min'] = len(stats[key]['as'])
+		if len(stats[key]['as']) >= total['as_max']:
+			total['as_max'] = len(stats[key]['as'])
+
+		if stats[key]['bandwidth'] <= total['bandwidth_min']:
+			total['bandwidth_min'] = stats[key]['bandwidth']
+		if stats[key]['bandwidth'] >= total['bandwidth_max']:
+			total['bandwidth_max'] = stats[key]['bandwidth']
+
+		if stats[key]['count'] <= total['count_min']:
+			total['count_min'] = stats[key]['count']
+		if stats[key]['count'] >= total['count_max']:
+			total['count_max'] = stats[key]['count']
+
+		if stats[key]['exit_probability'] <= total['exit_probability_min']:
+			total['exit_probability_min'] = stats[key]['exit_probability']
+		if stats[key]['exit_probability'] >= total['exit_probability_max']:
+			total['exit_probability_max'] = stats[key]['exit_probability']
+		
+		if stats[key]['weight'] <= total['weight_min']:
+			total['weight_min'] = stats[key]['weight']
+		if stats[key]['weight'] >= total['weight_max']:
+			total['weight_max'] = stats[key]['weight']
 
 		for c in countries:
 			key = c.alpha2.lower()
