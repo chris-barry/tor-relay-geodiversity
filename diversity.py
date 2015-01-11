@@ -39,7 +39,6 @@ def new_dict(name='', name3='NONE'):
 		'country_name3':     name3,
 		'as':                {},
 		'count_q':           '',
-		'family':            {},
 		}
 
 def run_stats(nodes):
@@ -48,9 +47,43 @@ def run_stats(nodes):
 		# NOTE: This will probably not result in 100% proper names.
 		# Python2 does not cooperate nicely with Unicode. :-(
 		stats[c.alpha2.lower()] = new_dict(c.name.encode('ascii','ignore'), c.alpha3)
-
-	stats['total'] = new_dict('z-total') # Total stats, z is for lexical sorting to last.
 	stats['None'] = new_dict('Unknown, GEOIP error.') # For unknown countries.
+
+	# Total is stored in a different structure to make retreiving stats easier.
+	total = {
+		'countries': 0,
+		'countries_seen': 0,
+
+		'as'      : {},
+		'as_pct'  : 0,
+		'as_min'  : 0,
+		'as_avg'  : 0,
+		'as_max'  : 0,
+
+		'count'      : 0,
+		'count_pct'  : 0,
+		'count_min'  : 0,
+		'count_avg'  : 0,
+		'count_max'  : 0,
+
+		'bandwidth'      : 0,
+		'bandwidth_pct'  : 0,
+		'bandwidth_min'  : 0,
+		'bandwidth_avg'  : 0,
+		'bandwidth_max'  : 0,
+
+		'exit_probability'      : 0,
+		'exit_probability_pct'  : 0,
+		'exit_probability_min'  : 0,
+		'exit_probability_avg'  : 0,
+		'exit_probability_max'  : 0,
+
+		'weight'      : 0,
+		'weight_pct'  : 0,
+		'weight_min'  : 0,
+		'weight_avg'  : 0,
+		'weight_max'  : 0,
+	}
 
 	# Aggregrate some numbers.
 	for relay in relays.relays:
@@ -69,30 +102,34 @@ def run_stats(nodes):
 			stats[key]['exit_probability'] += relay.exit_probability
 			stats[key]['as'][relay.as_number] = 1
 
+			""" # This does not do what I thought it would.
 			if relay.family is not None:
 				for family in relay.family:
 					stats[key]['family'][family] = 1
-					stats['total']['family'][family] = 1
+					total['family'][family] = 1
+			"""
 
-			stats['total']['count'] += 1
-			stats['total']['weight'] += relay.consensus_weight
-			stats['total']['bandwidth'] += relay.bandwidth[2]
-			stats['total']['exit_probability'] += relay.exit_probability
-			stats['total']['as'][relay.as_number] = 1
+			total['count'] += 1
+			total['weight'] += relay.consensus_weight
+			total['bandwidth'] += relay.bandwidth[2]
+			total['exit_probability'] += relay.exit_probability
+			total['as'][relay.as_number] = 1
 		except KeyError:
 			print relay.geo[0]
 	
-	# This helps with math later.
-	total = float(stats['total']['count'])
-	weight = float(stats['total']['weight'])
-	bandwidth = float(stats['total']['bandwidth'])
+	total['countries_seen'] = float(len(stats))
+	total['countries'] = float(len(countries))
+	
+	# The floats helps with math later.
+	bandwidth = float(total['bandwidth'])
+	countries_total = float(total['countries_seen'])
+	weight = float(total['weight'])
 
-	total_countries = float(len(countries))
-	stats['total']['count_average'] = stats['total']['count'] / total_countries
-	stats['total']['weight_agerave'] = stats['total']['weight'] / total_countries 
-	stats['total']['bandwidth_average'] = stats['total']['bandwidth'] / total_countries
-	stats['total']['exit_probability_average'] = stats['total']['exit_probability'] / total_countries
-	stats['total']['as_average'] = len(stats['total']['as']) / total_countries
+	total['as_average'] = len(total['as']) / countries_total 
+	total['bandwidth_avg'] = total['bandwidth'] / countries_total 
+	total['count_avg'] = total['count'] / countries_total 
+	total['exit_probability_avg'] = total['exit_probability'] / countries_total 
+	total['weight_avg'] = total['weight'] / countries_total 
 
 	# Compare each country to the total.
 	for relay in relays.relays:
@@ -105,37 +142,53 @@ def run_stats(nodes):
 				key = 'None'
 			else:
 				key = relay.geo[0]
-			stats[key]['count_percent'] = (stats[key]['count'] / total) * 100
-			stats[key]['weight_percent'] = (stats[key]['weight'] / weight) * 100
 			stats[key]['bandwidth_percent'] = (stats[key]['bandwidth'] / bandwidth) * 100
+			stats[key]['count_percent'] = (stats[key]['count'] / float(total['count'])) * 100
+			stats[key]['weight_percent'] = (stats[key]['weight'] / weight) * 100
 			# NOTE: we do not include exit_probability since it will go to 1.0 itself.
-
 		except KeyError:
-			print type(relay.geo[0])
+			print relay.geo[0]
 
-		total_countries = len(countries)
-		as_avg = len(stats['total']['as']) / total_countries
-		bandwidth_avg = stats['total']['bandwidth'] / total_countries
-		count_avg = stats['total']['count'] / total_countries
-		exit_probability_avg = stats['total']['exit_probability'] / total_countries
-		weight_avg = stats['total']['weight'] / total_countries
+		total['as_avg'] = len(total['as']) / countries_total
+		total['bandwidth_avg'] = total['bandwidth'] / countries_total
+		total['count_avg'] = total['count'] / countries_total
+		total['exit_probability_avg'] = total['exit_probability'] / countries_total
+		total['weight_avg'] = total['weight'] / countries_total
 
 		for c in countries:
 			key = c.alpha2.lower()
 			# Do the quintiles for the number of nodes per country.
-			c = stats[key]['count']
-			if stats[key]['count'] >= count_avg:
-				stats[key]['count_q'] = 'Over'
-			if stats[key]['count'] < count_avg:
-				stats[key]['count_q'] = 'Under'
+			c = stats[key]['count'] - total['count_avg']
+			# Get mean difference, use it to make some standard deviation plot.
+			if c > 0 and c < 10 :
+				stats[key]['count_q'] = 'Over_1'
+			if c > 0 and c < 20 :
+				stats[key]['count_q'] = 'Over_2'
+			if c > 0 and c < 30 :
+				stats[key]['count_q'] = 'Over_3'
+			if c > 0 and c > 40:
+				stats[key]['count_q'] = 'Over_4'
+
+			if c < 0 and c < -10:
+				stats[key]['count_q'] = 'Under_1'
+			if c < 0 and c < -20:
+				stats[key]['count_q'] = 'Under_2'
+			if c < 0 and c < -30:
+				stats[key]['count_q'] = 'Under_3'
+			if c < -40:
+				stats[key]['count_q'] = 'Under_4'
+			if c == 0:
+				stats[key]['count_q'] = 'Equal'
+
 			if stats[key]['count'] == 0:
 				stats[key]['count_q'] = 'None'
-				
 
-	# Sanity - all should be 100% += floating point errors.
-	stats['total']['count_percent'] = (stats['total']['count'] / total) * 100
-	stats['total']['weight_percent'] = (stats['total']['weight'] / weight) * 100
-	stats['total']['bandwidth_percent'] = (stats['total']['bandwidth'] / bandwidth) * 100
+	# Sanity - all should be 100%.
+	total['count_pct'] = (total['count'] / float(total['count'])) * 100
+	total['weight_pct'] = (total['weight'] / weight) * 100
+	total['bandwidth_pct'] = (total['bandwidth'] / bandwidth) * 100
+
+	#pprint.pprint(total)
 
 	# Sort by country name.
 	stats_sorted = []
@@ -144,15 +197,16 @@ def run_stats(nodes):
 	for key in keylist:
 		stats_sorted.append(stats[key])
 
-	return stats_sorted
+	return (stats_sorted, total)
 
 
 # Do the templating
-def make_template(stats={}, out_dir='.', template_file='index.html'):
+def make_template(stats={}, total={}, out_dir='.', template_file='index.html'):
 	env = Environment(loader=FileSystemLoader('templates'))
 	template = env.get_template(template_file)
 	s = template.render(
 		stats=stats,
+		total=total,
 		time=datetime.datetime.utcnow(),
 		number_format='{:,}',
 		percent_format='{0:0.2f}')
@@ -169,11 +223,11 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	relays = get_relays(debug=args.debug)
-	stats = run_stats(nodes=relays)
+	stats, total = run_stats(nodes=relays)
 
-	make_template(stats=stats, out_dir=args.output_dir, template_file='index.html')
-	make_template(stats=stats, out_dir=args.output_dir, template_file='tabulated.html')
-	make_template(stats=stats, out_dir=args.output_dir, template_file='mapped-count.html')
+	make_template(stats=stats, total=total, out_dir=args.output_dir, template_file='index.html')
+	make_template(stats=stats, total=total, out_dir=args.output_dir, template_file='tabulated.html')
+	make_template(stats=stats, total=total, out_dir=args.output_dir, template_file='mapped-count.html')
 
 	try:
 		shutil.rmtree(os.path.join(args.output_dir, 'js'))

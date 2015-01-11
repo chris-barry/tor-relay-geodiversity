@@ -14,7 +14,7 @@ tabulated
 
 {% block content %}
 
-<h1>Tabulated Data</h1>
+<h2>Tabulated Data</h2>
 
 <table border=2 class="sortable">
 	<tr>
@@ -24,7 +24,6 @@ tabulated
 		<th>Bandwidth (MBps)</th>
 		<th>Exit Probablility</th>
 		<th>Unique ASs</th>
-		<th>Unique Family</th>
 	</tr>
 	{%- for country in stats %}
 	<tr>
@@ -34,9 +33,17 @@ tabulated
 		<td sorttable_customkey="{{number_format.format((country['bandwidth']/1000000))}}">{{number_format.format((country['bandwidth']/1000000))}} ({{percent_format.format(country['bandwidth_percent'])}}%)</td>
 		<td sorttable_customkey="{{percent_format.format(country['exit_probability'])}}">{{percent_format.format(country['exit_probability'])}}%</td>
 		<td>{{country['as']|count}}</td>
-		<td>{{country['family']|count}}</td>
 	</tr>
 	{% endfor %}
+		<td sorttable_customkey="zzz">Total</td>
+		<td sorttable_customkey="{{number_format.format(total['count'])}}">{{number_format.format(total['count'])}} ({{percent_format.format(total['count_pct'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format(total['weight'])}}">{{number_format.format(total['weight'])}} ({{percent_format.format(total['weight_pct'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format((total['bandwidth']/1000000))}}">{{number_format.format((total['bandwidth']/1000000))}} ({{percent_format.format(total['bandwidth_pct'])}}%)</td>
+		<td sorttable_customkey="{{percent_format.format(total['exit_probability'])}}">{{percent_format.format(total['exit_probability'])}}%</td>
+		<td>{{total['as']|count}}</td>
+	{#
+		<td>TODO</td>
+	#}
 		</table>
 	</div>
 {% endblock %}
