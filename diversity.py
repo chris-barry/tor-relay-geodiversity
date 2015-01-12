@@ -12,6 +12,7 @@ from onion_py.caching import OnionSimpleCache
 
 import argparse
 import datetime
+import math
 import shutil
 import os
 import pprint
@@ -40,6 +41,48 @@ def new_dict(name='', name3='NONE'):
 		'as':                {},
 		'count_q':           '',
 		}
+
+def bucket_num(num=0, bucket_size=10, scale=0.50):
+	if num == 0:
+		l = 0
+	else:
+		l = (math.log(num)*scale / bucket_size) // 1
+	d = ''
+	if num <= 0 or l == 0:
+		 d = "None"
+	if num > 0 or l == 1:
+		 d = "one"
+	if l == 2:
+		 d = "two"
+	if l == 3:
+		 d = "three"
+	if l == 4:
+		 d = "four"
+	if l == 5:
+		 d = "five"
+	if l == 6:
+		 d = "six"
+	if l == 7:
+		 d = "seven"
+	if l >= 8:
+		 d = "eight"
+	return d
+
+def get_ranges(ranges=10, min=0, max=0):
+	bucket_size = math.log(max)/ranges
+	r = [0] * (ranges + 1)
+
+	if min == 0:
+		r[0] = 0
+	else:
+		r[0] = math.log(total['count_min'])
+
+	for x in range(1, ranges):
+		r[x] = bucket_size * x
+
+	r[ranges] = math.log(max)
+
+	return r
 
 def run_stats(nodes):
 	stats = {}
@@ -106,7 +149,7 @@ def run_stats(nodes):
 			total['count'] += 1
 			total['weight'] += relay.consensus_weight
 			total['bandwidth'] += relay.bandwidth[2]
-			total['exit_probability'] += relay.exit_probability
+			total['exit_probability'] += (relay.exit_probability * 100)
 			total['as'][relay.as_number] = 1
 		except KeyError:
 			print relay.geo[0]
@@ -176,38 +219,25 @@ def run_stats(nodes):
 		if stats[key]['weight'] >= total['weight_max']:
 			total['weight_max'] = stats[key]['weight']
 
-		for c in countries:
-			key = c.alpha2.lower()
-			# Do the quintiles for the number of nodes per country.
-			c = stats[key]['count'] - total['count_avg']
-			# Get mean difference, use it to make some standard deviation plot.
-			if c > 0 and c < 10 :
-				stats[key]['count_q'] = 'Over_1'
-			if c > 0 and c < 20 :
-				stats[key]['count_q'] = 'Over_2'
-			if c > 0 and c < 30 :
-				stats[key]['count_q'] = 'Over_3'
-			if c > 0 and c > 40:
-				stats[key]['count_q'] = 'Over_4'
+	as_range = get_ranges(ranges=10, min=total['as_min'], max=total['as_max'])
+	bandwidth_range = get_ranges(ranges=10, min=total['bandwidth_min'], max=total['bandwidth_max'])
+	count_range = get_ranges(ranges=10, min=total['count_min'], max=total['count_max'])
+	exit_range = get_ranges(ranges=10, min=total['exit_probability_min'], max=total['exit_probability_max'])
+	weight_range = get_ranges(ranges=10, min=total['weight_min'], max=total['weight_max'])
 
-			if c < 0 and c < -10:
-				stats[key]['count_q'] = 'Under_1'
-			if c < 0 and c < -20:
-				stats[key]['count_q'] = 'Under_2'
-			if c < 0 and c < -30:
-				stats[key]['count_q'] = 'Under_3'
-			if c < -40:
-				stats[key]['count_q'] = 'Under_4'
-			if c == 0:
-				stats[key]['count_q'] = 'Equal'
-
-			if stats[key]['count'] == 0:
-				stats[key]['count_q'] = 'None'
+	for c in countries:
+		key = c.alpha2.lower()
+		stats[key]['as_q'] = bucket_num(num=len(stats[key]['as']),            bucket_size=as_range[1]-as_range[0])
+		stats[key]['bandwidth_q'] = bucket_num(num=stats[key]['bandwidth'],   bucket_size=bandwidth_range[1]-bandwidth_range[0])
+		stats[key]['count_q'] = bucket_num(num=stats[key]['count'],           bucket_size=count_range[1]-count_range[0])
+		#stats[key]['exit_q'] = bucket_num(num=stats[key]['exit_probability'], bucket_size=exit_range[1]-exit_range[0], scale=100)
+		stats[key]['exit_q'] = bucket_num(num=stats[key]['exit_probability'], bucket_size=exit_range[1]-exit_range[0])
+		stats[key]['weight_q'] = bucket_num(num=stats[key]['weight'],         bucket_size=weight_range[1]-weight_range[0])
 
 	# Sanity - all should be 100%.
 	total['count_pct'] = (total['count'] / float(total['count'])) * 100
-	total['weight_pct'] = (total['weight'] / weight) * 100
 	total['bandwidth_pct'] = (total['bandwidth'] / bandwidth) * 100
+	total['weight_pct'] = (total['weight'] / weight) * 100
 
 	#pprint.pprint(total)
 

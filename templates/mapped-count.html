@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-mapped
+mapped count
 {% endblock %}
 
 {% block css_extra %}
@@ -13,11 +13,27 @@ mapped
 <script src="js/datamaps.world.min.js"></script>
 
 <script>
+	var as = {
+		{%- for country in stats %}{{country['country_name3']}}: { fillKey: '{{country['as_q']}}', count:{{country['as']|count}} },{% endfor %}
+	}
+	var bandwidth = {
+		{%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['bandwidth_q']}}', count:'{{country['bandwidth']/1000000}} MBps' },{% endfor %}
+	}
+	var counts = {
+		{%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['count_q']}}', count:{{country['count']}} },{% endfor %}
+	}
+	var exit = {
+		{%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['exit_q']}}', count:{{country['exit_probability']}} },{% endfor %}
+	}
+	var weight = {
+		{%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['weight_q']}}', count:{{country['weight']}} },{% endfor %}
+	}
+
 	var map = new Datamap({
 		scope: 'world',
 		element: document.getElementById('container'),
 		projection: 'equirectangular',
-		height: '800',
+		height: '1300',
 		//width: '800',
 		geographyConfig: {
 			popupTemplate: function(geography, data) {
@@ -27,14 +43,20 @@ mapped
 		fills: {
 			/* these two should stay the same. */
 			defaultFill: 'gray', None: 'gray',
-			Over: 'crimson',
-			Under: 'SteelBlue',
+
+			one:   'rgb(70, 130, 200)', /* SteelBlue */
+			two:   'rgb(65, 120, 180)', /* -5, -10, -20 */
+			three: 'rgb(60, 110, 160)',
+			four:  'rgb(55, 100, 140)',
+			five:  'rgb(50,  90, 120)',
+			six:   'rgb(45,  80, 100)',
+			seven: 'rgb(40,  70,  80)',
+			eight: 'rgb(35,  60,  60)',
+			nine:  'rgb(30,  50,  40)',
+			ten:   'rgb(25,  40,  20)',
 		},
 
-		data: {
-		{%- for country in stats %}
-		{{country['country_name3']}}: { fillKey: '{{country['count_q']}}', count:{{country['count']}} },{% endfor %}
-		}
+		data: {},
 
 	})
 	map.legend();
@@ -45,11 +67,22 @@ mapped
 <h2>Nodes Per Country</h2>
 <p>
 The number of nodes in each country compared to the average.
-Red countries contain a higher than average number of nodes.
-Blue countries contain a lower than average number of nodes.
+Blue countries contain a higher than average number of nodes.
+Green countries contain a lower than average number of nodes.
 Gray countries contain <em>no</em> nodes.
 </p>
+<p>
+I am sorry if you are color blind, these are horrible colors to use.
+</p>
+
+<button onclick="map.updateChoropleth(as)">ASs</button>
+<button onclick="map.updateChoropleth(bandwidth)">bandwidth</button>
+<button onclick="map.updateChoropleth(counts)">count</button>
+<button onclick="map.updateChoropleth(exit)">exit</button>
+<button onclick="map.updateChoropleth(weight)">weight</button>
+
 <div id="container"></div>
+<br>
 <br>
 {% endblock %}
 
