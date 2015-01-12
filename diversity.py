@@ -14,17 +14,22 @@ import argparse
 import datetime
 import math
 import shutil
+import sys
 import os
 import pprint
 
 
 # Get relay information from Onionoo
-def get_relays(debug=False):
-	manager = Manager(OnionSimpleCache())
-	if args.debug:
-		s = manager.query('details', limit=9)
-	else:
-		s = manager.query('details')
+def get_relays(debug=False, host=''):
+	manager = Manager(OnionSimpleCache(), onionoo_host=host)
+	try:
+		if args.debug:
+			s = manager.query('details', limit=9)
+		else:
+			s = manager.query('details')
+	except:
+		print 'Problem with Onionoo: ', sys.exc_info()[0]
+		sys.exit()
 	return s
 
 def new_dict(name='', name3='NONE'):
@@ -49,23 +54,23 @@ def bucket_num(num=0, bucket_size=10, scale=0.50):
 		l = (math.log(num)*scale / bucket_size) // 1
 	d = ''
 	if num <= 0 or l == 0:
-		 d = "None"
+		 d = 'None'
 	if num > 0 or l == 1:
-		 d = "one"
+		 d = 'one'
 	if l == 2:
-		 d = "two"
+		 d = 'two'
 	if l == 3:
-		 d = "three"
+		 d = 'three'
 	if l == 4:
-		 d = "four"
+		 d = 'four'
 	if l == 5:
-		 d = "five"
+		 d = 'five'
 	if l == 6:
-		 d = "six"
+		 d = 'six'
 	if l == 7:
-		 d = "seven"
+		 d = 'seven'
 	if l >= 8:
-		 d = "eight"
+		 d = 'eight'
 	return d
 
 def get_ranges(ranges=10, min=0, max=0):
@@ -270,10 +275,11 @@ def make_template(stats={}, total={}, out_dir='.', template_file='index.html'):
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-d', '--debug', help='Enable debug settings', action='store_true')
-	parser.add_argument('-o', '--output-dir', help='Where to save file', type=str, default='output/')
+	parser.add_argument('-o', '--output-dir', help='Output directory', type=str, default='output/')
+	parser.add_argument('-i', '--onionoo-instance', help='Onionoo instance to use', type=str, default='https://onionoo.torproject.org/')
 	args = parser.parse_args()
 
-	relays = get_relays(debug=args.debug)
+	relays = get_relays(debug=args.debug, host=args.onionoo_instance)
 	stats, total = run_stats(nodes=relays)
 
 	make_template(stats=stats, total=total, out_dir=args.output_dir, template_file='index.html')
