@@ -147,7 +147,7 @@ def run_stats(nodes):
 			stats[key]['count'] += 1
 			stats[key]['weight'] += relay.consensus_weight
 			stats[key]['bandwidth'] += relay.bandwidth[2] # observed in bytes per second
-			stats[key]['exit_probability'] += relay.exit_probability
+			stats[key]['exit_probability'] += (relay.exit_probability * 100)
 			stats[key]['as'][relay.as_number] = 1
 		
 
@@ -224,18 +224,17 @@ def run_stats(nodes):
 		if stats[key]['weight'] >= total['weight_max']:
 			total['weight_max'] = stats[key]['weight']
 
-	as_range = get_ranges(ranges=10, min=total['as_min'], max=total['as_max'])
-	bandwidth_range = get_ranges(ranges=10, min=total['bandwidth_min'], max=total['bandwidth_max'])
-	count_range = get_ranges(ranges=10, min=total['count_min'], max=total['count_max'])
-	exit_range = get_ranges(ranges=10, min=total['exit_probability_min'], max=total['exit_probability_max'])
-	weight_range = get_ranges(ranges=10, min=total['weight_min'], max=total['weight_max'])
+	as_range = get_ranges(ranges=11, min=total['as_min'], max=total['as_max'])
+	bandwidth_range = get_ranges(ranges=11, min=total['bandwidth_min'], max=total['bandwidth_max'])
+	count_range = get_ranges(ranges=11, min=total['count_min'], max=total['count_max'])
+	exit_range = get_ranges(ranges=11, min=total['exit_probability_min'], max=total['exit_probability_max'])
+	weight_range = get_ranges(ranges=11, min=total['weight_min'], max=total['weight_max'])
 
 	for c in countries:
 		key = c.alpha2.lower()
 		stats[key]['as_q'] = bucket_num(num=len(stats[key]['as']),            bucket_size=as_range[1]-as_range[0])
 		stats[key]['bandwidth_q'] = bucket_num(num=stats[key]['bandwidth'],   bucket_size=bandwidth_range[1]-bandwidth_range[0])
 		stats[key]['count_q'] = bucket_num(num=stats[key]['count'],           bucket_size=count_range[1]-count_range[0])
-		#stats[key]['exit_q'] = bucket_num(num=stats[key]['exit_probability'], bucket_size=exit_range[1]-exit_range[0], scale=100)
 		stats[key]['exit_q'] = bucket_num(num=stats[key]['exit_probability'], bucket_size=exit_range[1]-exit_range[0])
 		stats[key]['weight_q'] = bucket_num(num=stats[key]['weight'],         bucket_size=weight_range[1]-weight_range[0])
 
