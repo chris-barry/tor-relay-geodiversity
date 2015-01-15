@@ -150,7 +150,6 @@ def run_stats(nodes):
 			stats[key]['exit_probability'] += (relay.exit_probability * 100)
 			stats[key]['as'][relay.as_number] = 1
 		
-
 			total['count'] += 1
 			total['weight'] += relay.consensus_weight
 			total['bandwidth'] += relay.bandwidth[2]
@@ -199,27 +198,27 @@ def run_stats(nodes):
 		total['weight_avg'] = total['weight'] / countries_total
 
 		# Ranges
-		if len(stats[key]['as']) <= total['as_min']:
+		if len(stats[key]['as']) <= total['as_min'] and len(stats[key]['as']) > 0:
 			total['as_min'] = len(stats[key]['as'])
 		if len(stats[key]['as']) >= total['as_max']:
 			total['as_max'] = len(stats[key]['as'])
 
-		if stats[key]['bandwidth'] <= total['bandwidth_min']:
+		if stats[key]['bandwidth'] <= total['bandwidth_min'] and stats[key]['bandwidth'] > 0:
 			total['bandwidth_min'] = stats[key]['bandwidth']
 		if stats[key]['bandwidth'] >= total['bandwidth_max']:
 			total['bandwidth_max'] = stats[key]['bandwidth']
 
-		if stats[key]['count'] <= total['count_min']:
+		if stats[key]['count'] <= total['count_min'] and stats[key]['count'] > 0:
 			total['count_min'] = stats[key]['count']
 		if stats[key]['count'] >= total['count_max']:
 			total['count_max'] = stats[key]['count']
 
-		if stats[key]['exit_probability'] <= total['exit_probability_min']:
+		if stats[key]['exit_probability'] <= total['exit_probability_min'] and stats[key]['exit_probability'] > 0:
 			total['exit_probability_min'] = stats[key]['exit_probability']
 		if stats[key]['exit_probability'] >= total['exit_probability_max']:
 			total['exit_probability_max'] = stats[key]['exit_probability']
 		
-		if stats[key]['weight'] <= total['weight_min']:
+		if stats[key]['weight'] <= total['weight_min'] and stats[key]['weight'] > 0:
 			total['weight_min'] = stats[key]['weight']
 		if stats[key]['weight'] >= total['weight_max']:
 			total['weight_max'] = stats[key]['weight']
@@ -262,7 +261,7 @@ def make_template(stats={}, total={}, out_dir='.', template_file='index.html'):
 	s = template.render(
 		stats=stats,
 		total=total,
-		time=datetime.datetime.utcnow(),
+		time=str(datetime.datetime.utcnow())[:-3],
 		number_format='{:,}',
 		percent_format='{0:0.2f}')
 	f = open(os.path.join(out_dir, template_file), 'w')
