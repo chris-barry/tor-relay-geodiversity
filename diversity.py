@@ -18,6 +18,7 @@ import sys
 import os
 import pprint
 
+five_eyes = ['us', 'gb', 'ca', 'nz', 'au']
 
 # Get relay information from Onionoo
 def get_relays(debug=False, host=''):
@@ -96,6 +97,7 @@ def run_stats(nodes):
 		# Python2 does not cooperate nicely with Unicode. :-(
 		stats[c.alpha2.lower()] = new_dict(c.name.encode('ascii','ignore'), c.alpha3)
 	stats['None'] = new_dict('Unknown, GEOIP error.') # For unknown countries.
+	stats['FVEY'] = new_dict('Five-Eyes Aggregrate.')
 
 	# Total is stored in a different structure to make retreiving stats easier.
 	total = {
@@ -149,6 +151,13 @@ def run_stats(nodes):
 			stats[key]['bandwidth'] += relay.bandwidth[2] # observed in bytes per second
 			stats[key]['exit_probability'] += (relay.exit_probability * 100)
 			stats[key]['as'][relay.as_number] = 1
+
+			if key in five_eyes:
+				stats['FVEY']['count'] += 1
+				stats['FVEY']['weight'] += relay.consensus_weight
+				stats['FVEY']['bandwidth'] += relay.bandwidth[2] # observed in bytes per second
+				stats['FVEY']['exit_probability'] += (relay.exit_probability * 100)
+				stats['FVEY']['as'][relay.as_number] = 1
 		
 			total['count'] += 1
 			total['weight'] += relay.consensus_weight
@@ -189,6 +198,9 @@ def run_stats(nodes):
 			# NOTE: we do not include exit_probability since it will go to 1.0 itself.
 		except KeyError:
 			print relay.geo[0]
+		stats['FVEY']['bandwidth_percent'] = (stats['FVEY']['bandwidth'] / bandwidth) * 100
+		stats['FVEY']['count_percent'] = (stats['FVEY']['count'] / float(total['count'])) * 100
+		stats['FVEY']['weight_percent'] = (stats['FVEY']['weight'] / weight) * 100
 
 		# Averages
 		total['as_avg'] = len(total['as']) / countries_total
