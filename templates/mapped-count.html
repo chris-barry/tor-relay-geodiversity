@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-mapped count
+Mapped
 {% endblock %}
 
 {% block css_extra %}
@@ -13,76 +13,102 @@ mapped count
 <script src="js/datamaps.world.min.js"></script>
 
 <script>
-	var as = {
-		{%- for country in stats %}{{country['country_name3']}}: { fillKey: '{{country['as_q']}}', count:{{country['as']|count}} },{% endfor %}
-	}
-	var bandwidth = {
-		{%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['bandwidth_q']}}', count:'{{country['bandwidth']/1000000}} MBps' },{% endfor %}
-	}
-	var counts = {
-		{%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['count_q']}}', count:{{country['count']}} },{% endfor %}
-	}
-	var exit = {
-		{%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['exit_q']}}', count:{{country['exit_probability']}} },{% endfor %}
-	}
-	var weight = {
-		{%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['weight_q']}}', count:{{country['weight']}} },{% endfor %}
-	}
+	var as = { {%- for country in stats %}{{country['country_name3']}}: { fillKey: '{{country['as_q']}}', count:{{country['as']|count}} },{% endfor %}}
+	var bandwidth = { {%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['bandwidth_q']}}', count:'{{country['bandwidth']/1000000}} MBps' },{% endfor %} }
+	var counts = { {%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['count_q']}}', count:{{country['count']}} },{% endfor %} }
+	var exit = { {%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['exit_q']}}', count:'{{country['exit_probability']}} %' },{% endfor %} }
+	var weight = { {%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['weight_q']}}', count:{{country['weight']}} },{% endfor %} }
+
+
+	var colors = ['rgb(247,252,245)','rgb(229,245,224)','rgb(199,233,192)','rgb(161,217,155)','rgb(116,196,118)','rgb(65,171,93)','rgb(35,139,69)','rgb(0,109,44)','rgb(0,68,27)'];
 
 	var map = new Datamap({
 		scope: 'world',
-		element: document.getElementById('container'),
+		element: document.getElementById('map-container'),
 		projection: 'equirectangular',
-		height: '1300',
+		responsive: true,
+		//height: '800',
 		//width: '800',
 		geographyConfig: {
+			hideAntarctica: true, /* sorry */
 			popupTemplate: function(geography, data) {
 				return '<div class="hoverinfo"> <b>' + geography.properties.name + '</b>: ' + data.count + ' </div>';
 			},
 		},
 		fills: {
 			/* these two should stay the same. */
-			defaultFill: 'gray', None: 'gray',
+			defaultFill: 'Gainsboro', None: 'Gainsboro',
 
-			one:   'rgb(70, 130, 200)', /* SteelBlue */
-			two:   'rgb(65, 120, 180)', /* -5, -10, -20 */
-			three: 'rgb(60, 110, 160)',
-			four:  'rgb(55, 100, 140)',
-			five:  'rgb(50,  90, 120)',
-			six:   'rgb(45,  80, 100)',
-			seven: 'rgb(40,  70,  80)',
-			eight: 'rgb(35,  60,  60)',
-			nine:  'rgb(30,  50,  40)',
-			ten:   'rgb(25,  40,  20)',
+			one: colors[2],
+			two: colors[3],
+			three: colors[4],
+			four: colors[5],
+			five: colors[6],
+			/*
+			six: colors[7],
+			seven: colors[8],
+			eight: colors[9],
+			nine: colors[8],
+			ten: colors[9],
+			*/
+
 		},
 
 		data: {},
-
 	})
+	window.addEventListener('resize', function() {
+		/* Need to wait for DataMaps 0.3.5 for this. https://github.com/markmarkoh/datamaps/commit/014f4f65f992216e36d48f3ce297f65a9b6679c9 */
+		map.resize();
+	});
+	function updateMap(data, map_title) {
+		document.getElementById('map-title').innerHTML = map_title;
+		map.updateChoropleth(data);
+	}
 	map.legend();
+	updateMap(counts, 'Unique Relays');
 </script>
 {% endblock %}
 
 {% block content %}
-<h2>Nodes Per Country</h2>
-<p>
-The number of nodes in each country compared to the average.
-Blue countries contain a higher than average number of nodes.
-Green countries contain a lower than average number of nodes.
-Gray countries contain <em>no</em> nodes.
-</p>
-<p>
-I am sorry if you are color blind, these are horrible colors to use.
-</p>
+<div id="map-container">
+</div>
 
-<button onclick="map.updateChoropleth(as)">ASs</button>
-<button onclick="map.updateChoropleth(bandwidth)">bandwidth</button>
-<button onclick="map.updateChoropleth(counts)">count</button>
-<button onclick="map.updateChoropleth(exit)">exit</button>
-<button onclick="map.updateChoropleth(weight)">weight</button>
-
-<div id="container"></div>
 <br>
 <br>
+
+<!-- Awesome mapping advice: <http://www.gsd.harvard.edu/gis/manual/normalize/> -->
+<!-- Awesome map coloring advice <http://colorbrewer2.org/> -->
+
+<button onclick="updateMap(as,     'Unique ASs')">ASs</button>
+<button onclick="updateMap(bandwidth, 'Bandwidth')">bandwidth</button>
+<button onclick="updateMap(counts, 'Unique Relays')">count</button>
+<button onclick="updateMap(exit,   'Exit Percent Probability')">exit</button>
+<button onclick="updateMap(weight, 'Consensus Weight')">weight</button>
+
+<h2><span id="map-title"></span> Per Country</h2>
+<div id="explanation">
+	<p>
+	This map shows quantitative data on how distributed the tor network is.
+	If you hover over a country, you can see the quantity of the selected data point.
+	The darker green the country is, the higher of the respective count it has.
+	Gray countries contain <em>no</em> nodes in that category..
+	</p>
+
+	<p>
+	This data is <em>not</em> normalized to the surface area of the countries.
+	Normally in mapping this would be a bad idea, because it could mis-represent data.
+	For these maps the goal is to demonstrate how many tor relays are in different government regions.
+	So to normalize by area of the country would misrepresent the data.
+	</p>
+
+	<p>
+	This data was sourced from <a href="https://onionoo.torproject.org">The Tor Project's Onionoo</a>.
+	Onionoo collects data from the tor network consensus and makes it easily retrievable.
+	The raw data used to generate this map <a href="tabulated.html">can be found here</a>.
+	<!--Additionally, the aggregated data an be found in json form here.-->
+	This map is free open source software, if you find issues or have improvements let the authors know!
+	</p>
+</div>
+
 {% endblock %}
 
