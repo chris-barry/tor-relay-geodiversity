@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"> 
+	<meta name="description" content="Explore how diverse the tor network actually is."> 
+	<meta name="generator" content="https://github.com/chris-barry/tor-relay-geodiversity"> 
+	<title>
+	Tor Geodiversity - 
+	{% block title %}
+	{% endblock %}
+	</title>
+
+	<link rel="stylesheet" href="css/tor-diversity.css"/>
+	{% block css_extra %}
+	{% endblock %}
+
+</head>
+<body>
+
+	<h1>Tor Network Geodiversity Explorer</h1>
+
+	<hr/>
+
+	<noscript>
+		<p>
+		You are seeing this because you have JavaScript disabled.
+		The maps won't work without JavaScript, and there is not much that can be done about that.
+		This is an open source project, so feel free to inspect the source.
+		I promise it isn't mean!
+		</p>
+	</noscript>
+
+	<div id="content">
+		{% block content%}
+		{% endblock%}
+	</div>
+
+	<hr/>
+
+	<footer id="footer">
+		Last updated at <time>{{time}}+0000</time>.
+		| Data fetched from <a href="https://onionoo.torproject.org/">Onionoo</a>.
+		| Code is on <a href="https://github.com/chris-barry/tor-relay-geodiversity">GitHub</a>.
+		| This project is not funded or associated with the tor project.
+	</footer>
+
+	{% block js_extra %}
+	{% endblock%}
+
+</body>
+</html>
+

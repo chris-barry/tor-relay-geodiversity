@@ -1,3 +1,12 @@
+/* CSS for https://github.com/chris-barry/tor-relay-geodiversity */
+body {
+	background: WhiteSmoke;
+}
+
+table.sortable {
+	border: 2px solid black;
+}
+
 /* Sortable tables */
 table.sortable thead {
     background-color:#eee;
@@ -9,7 +18,26 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
     content: " \25B4\25BE" 
 }
 
-.template {
-	display:none;
+/* alternate colors */
+table.sortable tbody tr:nth-child(2n) td {
+	background: #dddddd;
+}
+table.sortable tbody tr:nth-child(2n+1) td {
+	background: #ccfffff;
 }
 
+#explanation {
+	height: auto;
+	-moz-column-count: 2;
+	-moz-column-gap: 20px;
+	-webkit-column-count: 2;
+	-webkit-column-gap: 20px;
+	column-count: 2;
+	column-gap: 20px;
+}
+
+#map-container {
+	height: 700px;
+	background: Azure;
+	border: 1px solid black;
+}

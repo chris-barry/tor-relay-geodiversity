@@ -1,3 +1,12 @@
+External Software:
+
+[d3.js](https://github.com/mbostock/d3/blob/master/LICENSE)
+[topojson](https://github.com/mbostock/topojson/blob/master/LICENSE)
+[datamaps.world.json](https://github.com/markmarkoh/datamaps/blob/master/LICENSE)
+[sorttable.js](http://www.kryogenix.org/code/browser/licence.html)
+
+Tor-relay-geodiversity:
+
 This is free and unencumbered software released into the public domain.
 
 Anyone is free to copy, modify, publish, use, compile, sell, or

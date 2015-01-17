@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}
+tabulated
+{% endblock %}
+
+{% block css_extra %}
+{% endblock %}
+
+{% block js_extra %}
+<script src="js/sorttable.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<h2>Tabulated Data</h2>
+
+<table class="sortable">
+	<tr>
+		<th>Country</th>
+		<th>Count</th>
+		<th>Consensus Weight (unit?)</th>
+		<th>Bandwidth (MBps)</th>
+		<th>Exit Probablility</th>
+		<th>Unique ASs</th>
+	</tr>
+	{%- for country in stats %}
+	<tr>
+		<td>{{country['country_name']}}</td>
+		<td sorttable_customkey="{{number_format.format(country['count'])}}">{{number_format.format(country['count'])}} ({{percent_format.format(country['count_percent'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format(country['weight'])}}">{{number_format.format(country['weight'])}} ({{percent_format.format(country['weight_percent'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format((country['bandwidth']/1000000))}}">{{number_format.format((country['bandwidth']/1000000))}} ({{percent_format.format(country['bandwidth_percent'])}}%)</td>
+		<td sorttable_customkey="{{percent_format.format(country['exit_probability'])}}">{{percent_format.format(country['exit_probability'])}}%</td>
+		<td>{{country['as']|count}}</td>
+	</tr>
+	{% endfor %}
+	<tr>
+		<td sorttable_customkey="zzz">Total</td>
+		<td sorttable_customkey="{{number_format.format(total['count'])}}">{{number_format.format(total['count'])}} ({{percent_format.format(total['count_pct'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format(total['weight'])}}">{{number_format.format(total['weight'])}} ({{percent_format.format(total['weight_pct'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format((total['bandwidth']/1000000))}}">{{number_format.format((total['bandwidth']/1000000))}} ({{percent_format.format(total['bandwidth_pct'])}}%)</td>
+		<td sorttable_customkey="{{percent_format.format(total['exit_probability'])}}">{{percent_format.format(total['exit_probability'])}}%</td>
+		<td>{{total['as']|count}}</td>
+	</tr>
+		</table>
+	</div>
+{% endblock %}
+
