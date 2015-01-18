@@ -13,7 +13,7 @@ tabulated
 
 {% block content %}
 
-<h2>Tabulated Data</h2>
+<h2>Tabulated Country Data</h2>
 
 <table class="sortable">
 	<tr>
@@ -42,6 +42,36 @@ tabulated
 		<td sorttable_customkey="{{percent_format.format(total['exit_probability'])}}">{{percent_format.format(total['exit_probability'])}}%</td>
 		<td>{{total['as']|count}}</td>
 	</tr>
+	</table>
+
+
+	<h2>Tabulated IGO Data</h2>
+
+	<p>
+	This table represents groups of countries which <em>could</em> be sharing data.
+	This is not to say that they are, just more data to consider.
+	Most of these aggregrates will overlap in geographic area, so expect sums greater than the absolute total.
+	</p>
+
+<table class="sortable">
+	<tr>
+		<th>Country</th>
+		<th>Count</th>
+		<th>Consensus Weight (unit?)</th>
+		<th>Bandwidth (MBps)</th>
+		<th>Exit Probablility</th>
+		<th>Unique ASs</th>
+	</tr>
+	{%- for country in igo_stats %}
+	<tr>
+		<td>{{country['country_name']}}</td>
+		<td sorttable_customkey="{{number_format.format(country['count'])}}">{{number_format.format(country['count'])}} ({{percent_format.format(country['count_percent'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format(country['weight'])}}">{{number_format.format(country['weight'])}} ({{percent_format.format(country['weight_percent'])}}%)</td>
+		<td sorttable_customkey="{{number_format.format((country['bandwidth']/1000000))}}">{{number_format.format((country['bandwidth']/1000000))}} ({{percent_format.format(country['bandwidth_percent'])}}%)</td>
+		<td sorttable_customkey="{{percent_format.format(country['exit_probability'])}}">{{percent_format.format(country['exit_probability'])}}%</td>
+		<td>{{country['as']|count}}</td>
+	</tr>
+	{% endfor %}
 		</table>
 	</div>
 {% endblock %}

@@ -18,7 +18,23 @@ import sys
 import os
 import pprint
 
-five_eyes = ['us', 'gb', 'ca', 'nz', 'au']
+igo = [ # List of Intergovernental organizations.
+	# https://en.wikipedia.org/wiki/Five_Eyes
+	('FVEY', 'Five Eye Aggregrate', ['us','gb','ca','nz','au']),
+
+	# https://en.wikipedia.org/wiki/Member_states_of_NATO
+	('NATO', 'NATO Aggregrate',['al','be','bg','ca','hr','cz','dk','ee','fr','de','gr','hu','is','it','lv','lt','lu','nl','no','pl','pt','ro','sk','si','es','tr','gb','us']),
+
+	# https://en.wikipedia.org/wiki/Member_state_of_the_European_Union
+	('EU', 'European Union Aggregrate',['at','be','bg','hr','cy','cz','dk','ee','fi','fr','de','gr','hr','ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se','gb']),
+
+	# https://en.wikipedia.org/wiki/Member_states_of_the_African_Union
+	#('AU', 'TODO: African Union Aggregrate',['de', 'fr']), # NOTE: THIS LIST IS NOT DONE OR CORRECT
+
+	# https://en.wikipedia.org/wiki/Arab_League
+	# NOTE: Syria (sy) is not in this list. The Wikipedia page does not make me think they are cooperaing too much.
+	('AL', 'Arab Leauge Aggregrate', ['dz','bh','km','dj','eg','iq','jo','kw','lb','ly','mr','ma','om','ps','qa','sa','so','sd','tn','ae','ye']),
+]
 
 # Get relay information from Onionoo
 def get_relays(debug=False, host=''):
@@ -92,12 +108,15 @@ def get_ranges(ranges=10, min=0, max=0):
 
 def run_stats(nodes):
 	stats = {}
+	igo_stats = {}
 	for c in countries:
 		# NOTE: This will probably not result in 100% proper names.
 		# Python2 does not cooperate nicely with Unicode. :-(
 		stats[c.alpha2.lower()] = new_dict(c.name.encode('ascii','ignore'), c.alpha3)
 	stats['None'] = new_dict('Unknown, GEOIP error.') # For unknown countries.
-	stats['FVEY'] = new_dict('Five-Eyes Aggregrate.')
+
+	for g in igo :
+		igo_stats[g[0]] = new_dict(g[1])
 
 	# Total is stored in a different structure to make retreiving stats easier.
 	total = {
@@ -152,12 +171,13 @@ def run_stats(nodes):
 			stats[key]['exit_probability'] += (relay.exit_probability * 100)
 			stats[key]['as'][relay.as_number] = 1
 
-			if key in five_eyes:
-				stats['FVEY']['count'] += 1
-				stats['FVEY']['weight'] += relay.consensus_weight
-				stats['FVEY']['bandwidth'] += relay.bandwidth[2] # observed in bytes per second
-				stats['FVEY']['exit_probability'] += (relay.exit_probability * 100)
-				stats['FVEY']['as'][relay.as_number] = 1
+			for g in igo:
+				if key in g[2]:
+					igo_stats[g[0]]['count'] += 1
+					igo_stats[g[0]]['weight'] += relay.consensus_weight
+					igo_stats[g[0]]['bandwidth'] += relay.bandwidth[2] # observed in bytes per second
+					igo_stats[g[0]]['exit_probability'] += (relay.exit_probability * 100)
+					igo_stats[g[0]]['as'][relay.as_number] = 1
 		
 			total['count'] += 1
 			total['weight'] += relay.consensus_weight
@@ -198,9 +218,11 @@ def run_stats(nodes):
 			# NOTE: we do not include exit_probability since it will go to 1.0 itself.
 		except KeyError:
 			print relay.geo[0]
-		stats['FVEY']['bandwidth_percent'] = (stats['FVEY']['bandwidth'] / bandwidth) * 100
-		stats['FVEY']['count_percent'] = (stats['FVEY']['count'] / float(total['count'])) * 100
-		stats['FVEY']['weight_percent'] = (stats['FVEY']['weight'] / weight) * 100
+
+		for g in igo:
+			igo_stats[g[0]]['bandwidth_percent'] = (igo_stats[g[0]]['bandwidth'] / bandwidth) * 100
+			igo_stats[g[0]]['count_percent'] = (igo_stats[g[0]]['count'] / float(total['count'])) * 100
+			igo_stats[g[0]]['weight_percent'] = (igo_stats[g[0]]['weight'] / weight) * 100
 
 		# Averages
 		total['as_avg'] = len(total['as']) / countries_total
@@ -254,7 +276,7 @@ def run_stats(nodes):
 	total['bandwidth_pct'] = (total['bandwidth'] / bandwidth) * 100
 	total['weight_pct'] = (total['weight'] / weight) * 100
 
-	#pprint.pprint(total)
+	#pprint.pprint(igo_stats)
 
 	# Sort by country name.
 	stats_sorted = []
@@ -263,15 +285,22 @@ def run_stats(nodes):
 	for key in keylist:
 		stats_sorted.append(stats[key])
 
-	return (stats_sorted, total)
+	igo_stats_sorted = []
+	keylist = igo_stats.keys()
+	keylist.sort()
+	for key in keylist:
+		igo_stats_sorted.append(igo_stats[key])
+
+	return (stats_sorted, igo_stats_sorted, total)
 
 
 # Do the templating
-def make_template(stats={}, total={}, out_dir='.', template_file='index.html'):
+def make_template(stats={}, igo_stats={}, total={}, out_dir='.', template_file='index.html'):
 	env = Environment(loader=FileSystemLoader('templates'))
 	template = env.get_template(template_file)
 	s = template.render(
 		stats=stats,
+		igo_stats=igo_stats, 
 		total=total,
 		time=str(datetime.datetime.utcnow())[:-3],
 		number_format='{:,}',
@@ -290,11 +319,11 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	relays = get_relays(debug=args.debug, host=args.onionoo_instance)
-	stats, total = run_stats(nodes=relays)
+	stats, igo_stats, total = run_stats(nodes=relays)
 
-	make_template(stats=stats, total=total, out_dir=args.output_dir, template_file='index.html')
-	make_template(stats=stats, total=total, out_dir=args.output_dir, template_file='tabulated.html')
-	make_template(stats=stats, total=total, out_dir=args.output_dir, template_file='mapped-count.html')
+	make_template(stats=stats, igo_stats=igo_stats, total=total, out_dir=args.output_dir, template_file='index.html')
+	make_template(stats=stats, igo_stats=igo_stats, total=total, out_dir=args.output_dir, template_file='tabulated.html')
+	make_template(stats=stats, igo_stats=igo_stats, total=total, out_dir=args.output_dir, template_file='mapped-count.html')
 
 	try:
 		shutil.rmtree(os.path.join(args.output_dir, 'js'))
