@@ -13,6 +13,7 @@ Mapped
 <script src="js/datamaps.world.min.js"></script>
 
 <script>
+	"use strict";
 	var as = { {%- for country in stats %}{{country['country_name3']}}: { fillKey: '{{country['as_q']}}', count:{{country['as']|count}} },{% endfor %}}
 	var bandwidth = { {%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['bandwidth_q']}}', count:'{{country['bandwidth']/1000000}} MBps' },{% endfor %} }
 	var counts = { {%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['count_q']}}', count:{{country['count']}} },{% endfor %} }
@@ -20,7 +21,7 @@ Mapped
 	var weight = { {%- for country in stats %} {{country['country_name3']}}: { fillKey: '{{country['weight_q']}}', count:{{country['weight']}} },{% endfor %} }
 
 
-	var colors = ['rgb(247,252,245)','rgb(229,245,224)','rgb(199,233,192)','rgb(161,217,155)','rgb(116,196,118)','rgb(65,171,93)','rgb(35,139,69)','rgb(0,109,44)','rgb(0,68,27)'];
+	var colors = ['rgb(255,247,236)','rgb(254,232,200)','rgb(253,212,158)','rgb(253,187,132)','rgb(252,141,89)','rgb(239,101,72)','rgb(215,48,31)','rgb(179,0,0)','rgb(127,0,0)'];
 
 	var map = new Datamap({
 		scope: 'world',
@@ -38,20 +39,17 @@ Mapped
 		fills: {
 			/* these two should stay the same. */
 			defaultFill: 'Gainsboro', None: 'Gainsboro',
-
-			one: colors[2],
-			two: colors[3],
-			three: colors[4],
-			four: colors[5],
-			five: colors[6],
-			/*
-			six: colors[7],
-			seven: colors[8],
-			eight: colors[9],
-			nine: colors[8],
-			ten: colors[9],
-			*/
-
+			Q0:  colors[0],
+			Q1:  colors[1],
+			Q2:  colors[2],
+			Q3:  colors[3],
+			Q4:  colors[4],
+			Q5:  colors[5],
+			Q6:  colors[5],
+			Q7:  colors[6],
+			Q8:  colors[7],
+			Q9:  colors[8],
+			Q10: colors[9],
 		},
 
 		data: {},
@@ -99,10 +97,11 @@ Mapped
 	Normally in mapping this would be a bad idea, because it could mis-represent data.
 	For these maps the goal is to demonstrate how many Tor relays are in different government regions.
 	So to normalize by area of the country would misrepresent the data.
+	Each incremental step of data (Q0-Q9) represent data bucketed between zero and the maximum of that respective value.
 	</p>
 
 	<p>
-	Currently Intergvovernnental agencies and IPs which do not match to a country in GeoIP are not shown.
+	Currently Intergovernmental agencies and IPs which do not match to a country in GeoIP are not shown.
 	They can be found in the <a href="tabulated.html">raw data</a>.
 	</p>
 

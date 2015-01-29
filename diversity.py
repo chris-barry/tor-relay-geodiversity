@@ -64,47 +64,24 @@ def new_dict(name='', name3='NONE'):
 		'count_q':           '',
 		}
 
-def bucket_num(num=0, bucket_size=10, scale=0.50):
+# Buckets the data into groups of 10.
+def bucket_num(num=0, bucket_size=10, scale=1):
 	if num == 0:
 		l = 0
 	else:
-		l = (math.log(num)*scale / bucket_size) // 1
-	d = ''
-	if num <= 0 or l == 0:
+		l = (10*(math.log(num) / math.log(bucket_size))) // 1
+
+	d = ''.join(['Q', str(int(l))])
+
+	# Some special cases.
+	if l < 0:
+		d = 'Q1'
+	if num <= 0:
 		 d = 'None'
-	if num > 0 or l == 1:
-		 d = 'one'
-	if l == 2:
-		 d = 'two'
-	if l == 3:
-		 d = 'three'
-	if l == 4:
-		 d = 'four'
-	if l == 5:
-		 d = 'five'
-	if l == 6:
-		 d = 'six'
-	if l == 7:
-		 d = 'seven'
-	if l >= 8:
-		 d = 'eight'
+	if l > 9:
+		d = 'Q9'
+
 	return d
-
-def get_ranges(ranges=10, min=0, max=0):
-	bucket_size = math.log(max)/ranges
-	r = [0] * (ranges + 1)
-
-	if min == 0:
-		r[0] = 0
-	else:
-		r[0] = math.log(total['count_min'])
-
-	for x in range(1, ranges):
-		r[x] = bucket_size * x
-
-	r[ranges] = math.log(max)
-
-	return r
 
 def run_stats(nodes):
 	stats = {}
@@ -257,19 +234,13 @@ def run_stats(nodes):
 		if stats[key]['weight'] >= total['weight_max']:
 			total['weight_max'] = stats[key]['weight']
 
-	as_range = get_ranges(ranges=11, min=total['as_min'], max=total['as_max'])
-	bandwidth_range = get_ranges(ranges=11, min=total['bandwidth_min'], max=total['bandwidth_max'])
-	count_range = get_ranges(ranges=11, min=total['count_min'], max=total['count_max'])
-	exit_range = get_ranges(ranges=11, min=total['exit_probability_min'], max=total['exit_probability_max'])
-	weight_range = get_ranges(ranges=11, min=total['weight_min'], max=total['weight_max'])
-
 	for c in countries:
 		key = c.alpha2.lower()
-		stats[key]['as_q'] = bucket_num(num=len(stats[key]['as']),            bucket_size=as_range[1]-as_range[0])
-		stats[key]['bandwidth_q'] = bucket_num(num=stats[key]['bandwidth'],   bucket_size=bandwidth_range[1]-bandwidth_range[0])
-		stats[key]['count_q'] = bucket_num(num=stats[key]['count'],           bucket_size=count_range[1]-count_range[0])
-		stats[key]['exit_q'] = bucket_num(num=stats[key]['exit_probability'], bucket_size=exit_range[1]-exit_range[0])
-		stats[key]['weight_q'] = bucket_num(num=stats[key]['weight'],         bucket_size=weight_range[1]-weight_range[0])
+		stats[key]['as_q'] = bucket_num(num=len(stats[key]['as']),            bucket_size=total['as_max'])
+		stats[key]['bandwidth_q'] = bucket_num(num=stats[key]['bandwidth'],   bucket_size=total['bandwidth_max'])
+		stats[key]['count_q'] = bucket_num(num=stats[key]['count'],           bucket_size=total['count_max'])
+		stats[key]['exit_q'] = bucket_num(num=stats[key]['exit_probability'], bucket_size=total['exit_probability_max'])
+		stats[key]['weight_q'] = bucket_num(num=stats[key]['weight'],         bucket_size=total['weight_max'])
 
 	# Sanity - all should be 100%.
 	total['count_pct'] = (total['count'] / float(total['count'])) * 100
