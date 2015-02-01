@@ -1,4 +1,11 @@
-Host CSS/JS inline.
-Link to VPSs.
-There should be a stronger score for how low a country is rated, leading to a total diversity score.
-	Should include: unique (AS, families), bandwith, consensus weight
+Even Sooner:
+* Make sure the map fits in the frame.
+* Show how large each Q is in the legend.
+
+Soon:
+* Only use fast nodes (200 KBps+?)
+
+Later:
+* There should be a stronger score for how low a country is rated, leading to a total diversity score.
+	* Should include: unique (AS, families), bandwith, consensus weight
+* Historical Data
