@@ -138,7 +138,7 @@ def run_stats(nodes):
 			continue
 		try:
 			key = ''
-			if relay.geo[0] is None or relay.geo[0] is u'':
+			if not relay.geo[0]:
 				key = 'None'
 			else:
 				key = relay.geo[0]
@@ -185,7 +185,7 @@ def run_stats(nodes):
 			continue
 		try:
 			key = ''
-			if relay.geo[0] is None:
+			if not relay.geo[0]:
 				key = 'None'
 			else:
 				key = relay.geo[0]
